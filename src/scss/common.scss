@@ -1,0 +1,58 @@
+* {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: transparent; 
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $yellow;
+    border-radius: 3px;
+  }
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+body {
+  background-color: $mainColor;
+  color: #fff;
+}
+
+[class*="__container"] {
+  width: 100%;
+  margin-inline: auto;
+  @include adaptiveValue("padding-left", 50, 20,0,1920,1024);
+  @include adaptiveValue("padding-right", 50, 20,0,1920,1024);
+}
+
+// SPLIT TYPE =============================================
+
+.split-lines,
+.split-words,
+.split-chars,
+.split-both {
+  font-kerning: none;
+}
+
+
+.min-vh {
+  min-height: 100svh;
+}

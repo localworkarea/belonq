@@ -1,0 +1,185 @@
+section {
+  border-bottom: toRem(2) solid #fff;
+}
+
+.hero {
+  // .hero__container
+  &__container {
+    // min-height: 100svh;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
+    // position: relative;
+  }
+	// .hero__first
+	&__first {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 62svh;
+	}
+  // .hero__logo
+  &__logo {
+  }
+  // .hero__start
+  &__start {
+  }
+  // .hero__second
+  &__second {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  // .hero__t-wr
+  &__t-wr {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-top: toRem(140);
+    max-width: 99%;
+  }
+  // .hero__title
+  &__title {
+  }
+  // .hero__right
+  &__right {
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    top: 100%;
+    left: 100%;
+    // transform: translate(100%,100%);
+    .panda-img {
+      position: absolute;
+      left: -32%;
+      width: 58vw;
+      height: auto;
+    }
+  }
+  // .hero__decor
+  &__decor {
+  }
+}
+
+.logo__ic {
+  position: fixed;
+  top: 50%;
+  left: 50px;
+  width: 47%;
+  height: auto;
+  transform: translate(0%,-50%);
+}
+
+.start-hero {
+  grid-column: 2/3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-left: toRem(100);
+  // .start-hero__list
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 6%;
+    width: 100%;
+  }
+  // .start-hero__item
+  &__item {
+    position: relative;
+    border: toRem(2) solid #fff;
+    aspect-ratio: 1/1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    &:last-child {
+      .start-hero__num {
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+  // .start-hero__num
+  &__num {
+    font-family: "Anton";
+    color: $yellow;
+    font-size: 4vw;
+    position: relative;
+    line-height: 1.2;
+    margin-bottom: 0.5vw;
+    &::after {
+      content:'+';
+      position: absolute;
+      right: -1.5vw;
+      bottom: 0%;
+    }
+  }
+  // .start-hero__name
+  &__name {
+    font-weight: "Gilroy";
+    font-weight: 400;
+    font-size: 1.6vw;
+  }
+}
+
+
+.title-hero {
+  font-weight: 700;
+  line-height: 0.8;
+  
+  text-transform: uppercase;
+  font-size: 13vw;
+  letter-spacing: -0.06em;
+  > span {
+    display: block;
+    overflow: hidden;
+    padding-right: 0.06em;
+    font-kerning: none;
+    span {
+      display: inline-block;
+      transform: translateY(100%);
+    }
+  }
+  .split-chars {
+  }
+  // .title-hero__a
+  &__a {
+    color: $yellow;
+  }
+  // .title-hero__b
+  &__b {
+    font-weight: 600;
+    text-align: right;
+    margin-right: toRem(26);
+  }
+  // .title-hero__c
+  &__c {
+  }
+  // .title-hero__d
+  &__d {
+    color: $yellow;
+    text-align: right;
+  }
+}
+
+
+.decor {
+  grid-row: 2/3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  // .decor__lines
+  &__lines {
+    overflow: hidden;
+    padding-bottom: toRem(48);
+    .lines-img {
+    }
+  }
+  .count-list {
+    margin-right: toRem(37);
+  }
+}
+
+
