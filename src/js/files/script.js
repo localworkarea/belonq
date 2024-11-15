@@ -4,7 +4,7 @@ import { isMobile } from "./functions.js";
 // Підключення списку активних модулів
 import { flsModules } from "./modules.js";
 
-
+import Lenis from 'lenis'
 
 import SplitType from 'split-type'
 
