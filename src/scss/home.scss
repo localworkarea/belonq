@@ -1,15 +1,16 @@
 section {
-  border-bottom: toRem(2) solid #fff;
+  // border-top: toRem(2) solid #fff;
+  // border-bottom: toRem(2) solid #fff;
 }
 
+// == HERO SECTION ===============================================
 .hero {
+  position: relative;
+  z-index: 2;
+  @include adaptiveValue("margin-bottom", 470,150,2,3840,1920.98);
+  @include adaptiveValue("margin-bottom", 150,5,3,1920.98,1024.98);
   // .hero__container
   &__container {
-    // min-height: 100svh;
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: center;
-    // position: relative;
   }
 	// .hero__first
 	&__first {
@@ -47,7 +48,7 @@ section {
     display: grid;
     grid-template-rows: 1fr 1fr;
     top: 100%;
-    left: 100%;
+    left: 120%;
     // transform: translate(100%,100%);
     .panda-img {
       position: absolute;
@@ -124,7 +125,6 @@ section {
   }
 }
 
-
 .title-hero {
   font-weight: 700;
   line-height: 0.8;
@@ -132,14 +132,14 @@ section {
   text-transform: uppercase;
   font-size: 13vw;
   letter-spacing: -0.06em;
-  > span {
+  .split-chars {
     display: block;
     overflow: hidden;
     padding-right: 0.06em;
     font-kerning: none;
-    span {
-      display: inline-block;
-      transform: translateY(100%);
+    .char {
+        display: inline-block;
+        transform: translateY(100%);
     }
   }
   .split-chars {
@@ -164,7 +164,6 @@ section {
   }
 }
 
-
 .decor {
   grid-row: 2/3;
   display: flex;
@@ -172,14 +171,271 @@ section {
   align-items: flex-end;
   // .decor__lines
   &__lines {
+    width: 60%;
     overflow: hidden;
     padding-bottom: toRem(48);
     .lines-img {
+      width: 100%;
+      height: auto;
     }
   }
   .count-list {
     margin-right: toRem(37);
+    width: 39%;
+    height: auto;
+  }
+}
+
+// == SERVICES SECTION =================================================
+.services {
+  overflow: hidden;
+  // .services__body
+  &__body {
+    display: flex;
+    flex-wrap: nowrap;
+    
+    // overflow-x: scroll;
+    // scroll-behavior: smooth;
+  }
+  // .services__item
+  &__item {
+    padding-top: toRem(20);
+    @include adaptiveValue("padding-left", 50, 20,0,1920,1024);
+    @include adaptiveValue("padding-right", 50, 20,0,1920,1024);
+    &:last-child {
+      padding-right: 30vw !important;
+    }
+  }
+}
+
+.item-first {
+  min-width: 100vw;
+  display: grid;
+  grid-template-columns: 1fr 51vw;
+	// .item-first__wrapper
+	&__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: toRem(15);
+    padding-right: toRem(40);
+	}
+  // .item-first__txts
+  &__txts {
+    // max-width: 60%;
+  }
+  // .item-first__txt
+  &__txt {
+    font-weight: 500;
+    line-height: 1;
+    @include adaptiveValue("font-size", 96,48,2,3840,1920.98);
+    @include adaptiveValue("font-size", 48,24,3,1920.98,480.98);
+    .acc {
+      color: $yellow;
+    }
+    .acc,
+    .word {
+      // margin-bottom: -3%;
+    }
+    .word {
+      overflow: hidden;
+      .word-span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(-100%);
+      }
+    }
+    &:not(:last-child) {
+      margin-bottom: 5%;
+    }
+  }
+  // .item-first__arr
+  &__arr {
+  }
+  // .item-first__nav
+  &__nav {
+  }
+}
+
+.item-services {
+}
+
+.nav-first {
+  position: relative;
+  background-image: url("../img/services/frame.png");
+  @extend %servicesCardBg;
+
+  // .nav-first__head
+  &__head {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 2%;
+    position: relative;
+    
+  }
+  // .nav-first__title
+  &__title {
+    position: relative;
+    z-index: 2;
+    font-weight: 600;
+    color: $yellow;
+    text-transform: uppercase;
+    top: toRem(-15);
+    @include adaptiveValue("font-size", 120,60,2,3840,1920.98);
+    @include adaptiveValue("font-size", 60,20,3,1920.98,480.98);
+  }
+  // .nav-first__body
+  &__body {
+    padding-top: toRem(30);
+    display: grid;
+    grid-template-columns: 56% 1fr;
+    @include adaptiveValue("column-gap", 100,50,2,3840,1920.98);
+    @include adaptiveValue("column-gap", 50,20,3,1920.98,480.98);
+    @include adaptiveValue("padding-left", 140,70,2,3840,1920.98);
+    @include adaptiveValue("padding-left", 70,20,3,1920.98,480.98);
+    @include adaptiveValue("padding-right", 100,50,2,3840,1920.98);
+    @include adaptiveValue("padding-right", 50,20,3,1920.98,480.98);
+    @include adaptiveValue("padding-bottom", 100,50,2,3840,1920.98);
+    @include adaptiveValue("padding-bottom", 50,20,3,1920.98,480.98);
+   
+  }
+  // .nav-first__nav
+  &__nav {
+  }
+  // .nav-first__list
+  &__list {
+  }
+  // .nav-first__item
+  &__item {
+    &:not(:last-child) {
+      @include adaptiveValue("margin-bottom", 20, 10,0,1920,1024.98);
+    }
+  }
+  // .nav-first__link
+  &__link {
+    display: grid;
+    grid-template-columns: 25% 1fr;
+    align-items: center;
+    width: 100%;
+    border: toRem(3) solid $gray57;
+    border-radius: toRem(157);
+    padding-top: 2%;
+    padding-bottom: 2%;
+    padding-right: toRem(5);
+    transition: background-color .3s ease, border-color .3s ease;
+    @extend %servicesCardFontSize80-40-20;
+    @media (any-hover: hover){
+      &:hover{
+        background-color: $yellow;
+        color: #000;
+        border-color: $yellow;
+      }
+    }
+  }
+  // .nav-first__ic
+  &__ic {
+    width: auto;
+    margin-left: 30%;
+    @include adaptiveValue("height", 48,24,0,3840,1920.98);
+  }
+  // .nav-first__side
+  &__side {
+    padding-top: toRem(17);
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
+  // .nav-first__txt
+  &__txt {
+    @extend %servicesCardText;
+    padding-left: 14%;
+    margin-bottom: toRem(30);
+  }
+  // .nav-first__decor
+  &__decor {
+  }
+}
+
+%servicesCardBg {
+  background-color: #000;
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: 100% 100%;
+}
+
+%servicesCardText {
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  @include adaptiveValue("font-size", 40,20,2,3840,1920.98);
+  @include adaptiveValue("font-size", 20,12,3,1920.98,1024.98);
+  span {
+    color: $yellow;
   }
 }
 
 
+%servicesCardFontSize80-40-20 {
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  @include adaptiveValue("font-size", 80,40,2,3840,1920.98);
+  @include adaptiveValue("font-size", 40,20,3,1920.98,1024.98);
+}
+
+
+.item-services {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 49.5vw;
+  position: relative;
+  background-image: url("../img/services/frame.png");
+  @extend %servicesCardBg;
+  @include adaptiveValue("padding-left", 112,50,2,3840,1920.98);
+  @include adaptiveValue("padding-left", 50,20,3,1920.98,480.98);
+  @include adaptiveValue("padding-right", 60,30,2,3840,1920.98);
+  @include adaptiveValue("padding-right", 30,20,3,1920.98,480.98);
+  @include adaptiveValue("padding-bottom", 60,35,2,3840,1920.98);
+  @include adaptiveValue("padding-bottom", 35,20,3,1920.98,480.98);
+  // .item-services__head
+  &__head {
+    display: grid;
+    grid-template-columns: 60% 1fr;
+    // margin-bottom: toRem(30);
+    margin-bottom: 3%;
+  }
+  // .item-services__txt
+  &__txt {
+    margin-top: 5%;
+    @extend %servicesCardText;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    display: box;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+  // .item-services__title
+  &__title {
+    display: flex;
+    align-items: center;
+    column-gap: 4%;
+    position: relative;
+    height: max-content;
+    white-space: nowrap;
+    @extend %servicesCardFontSize80-40-20;
+    img {
+      width: auto;
+      @include adaptiveValue("height", 70,37,2,3840,1920.98);
+      @include adaptiveValue("height", 37,24,3,1920.98,1024.98);
+    }
+  }
+  // .item-services__body
+  &__body {
+    flex: 1;
+    img {
+      aspect-ratio: 858/526;
+    }
+  }
+}

@@ -684,10 +684,10 @@
         } ]);
         return SplitType;
     }();
-    gsap.registerPlugin(ScrollTrigger);
     const splitTextLines = document.querySelectorAll(".split-lines");
     const splitTextWords = document.querySelectorAll(".split-words");
     const splitTextChars = document.querySelectorAll(".split-chars");
+    const splitTextCharsSpan = document.querySelectorAll(".split-chars-span");
     const splitTextBoth = document.querySelectorAll(".split-both");
     const splitSetSpan = document.querySelectorAll(".split-words.set-span");
     function initSplitType() {
@@ -714,6 +714,15 @@
                 char.style.setProperty("--index", index);
             }));
         }));
+        if (splitTextCharsSpan.length > 0) splitTextCharsSpan.forEach((elementSpan => {
+            const splitInstance = new SplitType(elementSpan, {
+                types: "chars"
+            });
+            splitInstance.chars.forEach(((char, index) => {
+                const textContent = char.textContent.trim();
+                char.innerHTML = `<span class="char-span">${textContent}</span>`;
+            }));
+        }));
         if (splitTextBoth.length > 0) splitTextBoth.forEach((element => {
             new SplitType(element, {
                 types: "lines, words"
@@ -732,19 +741,6 @@
         }));
     }
     initSplitType();
-    let lastWidth = window.innerWidth;
-    const resizeObserver = new ResizeObserver((entries => {
-        requestAnimationFrame((() => {
-            entries.forEach((entry => {
-                const currentWidth = entry.contentRect.width;
-                if (currentWidth !== lastWidth) {
-                    initSplitType();
-                    lastWidth = currentWidth;
-                }
-            }));
-        }));
-    }));
-    resizeObserver.observe(document.body);
     const lenis = new Lenis({
         smooth: true,
         smoothTouch: true,
@@ -756,119 +752,206 @@
         lenis.raf(time * 1e3);
     }));
     gsap.ticker.lagSmoothing(0);
-    const logoHeader = document.querySelector(".header__logo");
-    const logoImg = document.querySelector(".logo__ic");
-    const heroSection = document.querySelector(".hero");
-    const startHero = Array.from(document.querySelectorAll(".start-hero__item"));
-    const heroFirst = document.querySelector(".hero__first");
-    const heroSecond = document.querySelector(".hero__second");
-    document.querySelector(".title-hero");
-    const heroTitleA = document.querySelectorAll(".title-hero__a span");
-    const heroTitleB = document.querySelectorAll(".title-hero__b span");
-    const heroTitleC = document.querySelectorAll(".title-hero__c span");
-    const heroTitleD = document.querySelectorAll(".title-hero__d span");
-    const heroRight = document.querySelector(".hero__right");
-    function createAnimation() {
-        gsap.set(logoImg, {
-            top: "50%",
-            left: "50px",
-            width: "47%"
-        });
-        const scrollPosY = window.pageYOffset;
-        window.scrollTo(0, 0);
-        function getOffset(el) {
-            const rect = el.getBoundingClientRect();
-            return {
-                top: rect.top + window.pageYOffset,
-                left: rect.left + window.pageXOffset,
-                width: rect.width,
-                height: rect.height
-            };
-        }
-        const logoHeaderPosition = getOffset(logoHeader);
-        window.scrollTo(0, scrollPosY);
-        ScrollTrigger.getAll().forEach((trigger => trigger.kill()));
-        gsap.to(logoImg, {
-            scrollTrigger: {
-                trigger: heroSection,
-                start: "top top",
-                end: "60% center",
-                scrub: 1,
-                onUpdate: self => {
-                    let progress = self.progress;
-                    if (progress > .9) logoImg.classList.add("_anim-end"); else logoImg.classList.remove("_anim-end");
-                }
-            },
-            width: logoHeaderPosition.width,
-            left: logoHeaderPosition.left,
-            top: logoHeaderPosition.top + logoHeaderPosition.height / 2,
-            ease: "none"
-        });
-        if (startHero.length) gsap.to(startHero, {
-            top: "-100%",
-            opacity: 0,
-            stagger: index => index * .03,
-            scrollTrigger: {
-                trigger: heroFirst,
-                start: "top top",
-                end: "bottom 20%",
-                scrub: 1.2
-            }
-        });
-        if (heroSecond) {
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: heroSecond,
-                    start: "top center",
-                    end: "bottom bottom",
-                    scrub: 1
-                }
+    window.addEventListener("DOMContentLoaded", (() => {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.registerPlugin(ScrollToPlugin);
+        const logoHeader = document.querySelector(".header__logo");
+        const logoImg = document.querySelector(".logo__ic");
+        const heroSection = document.querySelector(".hero");
+        const startHero = Array.from(document.querySelectorAll(".start-hero__item"));
+        const heroFirst = document.querySelector(".hero__first");
+        const heroSecond = document.querySelector(".hero__second");
+        document.querySelector(".title-hero");
+        const heroRight = document.querySelector(".hero__right");
+        const heroTitleA = document.querySelectorAll(".title-hero__a .char");
+        const heroTitleB = document.querySelectorAll(".title-hero__b .char");
+        const heroTitleC = document.querySelectorAll(".title-hero__c .char");
+        const heroTitleD = document.querySelectorAll(".title-hero__d .char");
+        const servicesSection = document.querySelector(".services");
+        const servicesBody = document.querySelector(".services__body");
+        const itemFirstTxt = document.querySelectorAll(".item-first__txt .word .word-span");
+        document.querySelectorAll(".services__item");
+        const navLinks = document.querySelectorAll(".nav-first__link");
+        function createAnimation() {
+            gsap.set(logoImg, {
+                top: "50%",
+                left: "50px",
+                width: "47%"
             });
-            tl.to(heroTitleA, {
-                y: "0%",
-                stagger: .08,
-                ease: "power2.out"
-            }, "-=0.5");
-            tl.to(heroTitleB, {
-                y: "0%",
-                stagger: .08,
-                ease: "power2.out"
-            }, "-=0.5");
-            tl.to(heroTitleC, {
-                y: "0%",
-                stagger: .08,
-                ease: "power2.out"
-            }, "-=0.5");
-            tl.to(heroTitleD, {
-                y: "0%",
-                stagger: .08,
-                ease: "power2.out"
-            }, "-=0.5");
-            gsap.to(heroRight, {
-                top: "0%",
-                left: "0%",
-                ease: "power2.out",
+            const scrollPosY = window.pageYOffset;
+            window.scrollTo(0, 0);
+            function getOffset(el) {
+                const rect = el.getBoundingClientRect();
+                return {
+                    top: rect.top + window.pageYOffset,
+                    left: rect.left + window.pageXOffset,
+                    width: rect.width,
+                    height: rect.height
+                };
+            }
+            const logoHeaderPosition = getOffset(logoHeader);
+            window.scrollTo(0, scrollPosY);
+            ScrollTrigger.refresh();
+            ScrollTrigger.getAll().forEach((trigger => trigger.kill()));
+            gsap.to(logoImg, {
                 scrollTrigger: {
-                    trigger: heroSecond,
-                    start: "top center",
-                    end: "120% bottom",
+                    trigger: heroSection,
+                    start: "top top",
+                    end: "55% center",
+                    scrub: 1,
+                    onUpdate: self => {
+                        let progress = self.progress;
+                        if (progress > .9) logoImg.classList.add("_anim-end"); else logoImg.classList.remove("_anim-end");
+                    }
+                },
+                width: logoHeaderPosition.width,
+                left: logoHeaderPosition.left,
+                top: logoHeaderPosition.top + logoHeaderPosition.height / 2,
+                ease: "none"
+            });
+            if (startHero.length) gsap.to(startHero, {
+                top: "-100%",
+                opacity: 0,
+                stagger: index => index * .03,
+                scrollTrigger: {
+                    trigger: heroFirst,
+                    start: "top top",
+                    end: "bottom 20%",
                     scrub: 1.2
                 }
             });
+            if (heroSecond) {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: heroSecond,
+                        start: "top center",
+                        end: "140% bottom",
+                        scrub: 1.2
+                    }
+                });
+                tl.to(heroTitleA, {
+                    y: "0%",
+                    stagger: .08,
+                    ease: "power2.out"
+                }, "-=0.5");
+                tl.to(heroTitleB, {
+                    y: "0%",
+                    stagger: .08,
+                    ease: "power2.out"
+                }, "-=0.5");
+                tl.to(heroTitleC, {
+                    y: "0%",
+                    stagger: .08,
+                    ease: "power2.out"
+                }, "-=0.5");
+                tl.to(heroTitleD, {
+                    y: "0%",
+                    stagger: .08,
+                    ease: "power2.out"
+                }, "-=0.5");
+                tl.to(heroTitleA, {
+                    opacity: "0",
+                    stagger: .05,
+                    ease: "power2.out"
+                });
+                tl.to(heroTitleB, {
+                    opacity: "0",
+                    stagger: .05,
+                    ease: "power2.out"
+                }, "-=0.5");
+                tl.to(heroTitleC, {
+                    opacity: "0",
+                    stagger: .05,
+                    ease: "power2.out"
+                }, "-=0.5");
+                tl.to(heroTitleD, {
+                    opacity: "0",
+                    stagger: .05,
+                    ease: "power2.out"
+                }, "-=0.5");
+                const tl2 = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: heroSecond,
+                        start: "top center",
+                        end: "bottom bottom",
+                        scrub: 1.2
+                    }
+                });
+                tl2.to(heroRight, {
+                    top: "0%",
+                    left: "0%",
+                    ease: "power2.out"
+                });
+            }
+            if (servicesSection) {
+                gsap.to(itemFirstTxt, {
+                    y: "0%",
+                    opacity: 1,
+                    stagger: index => index * .05,
+                    scrollTrigger: {
+                        trigger: servicesSection,
+                        start: "top 60%",
+                        end: "80% bottom",
+                        scrub: 1
+                    }
+                });
+                gsap.to(heroRight, {
+                    opacity: 0,
+                    scrollTrigger: {
+                        trigger: servicesSection,
+                        start: "top 20%",
+                        end: "bottom bottom",
+                        scrub: 1.2
+                    }
+                });
+                navLinks.forEach((link => {
+                    link.addEventListener("click", (event => {
+                        event.preventDefault();
+                        const targetId = link.getAttribute("data-target");
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            const targetWidth = targetElement.offsetWidth;
+                            const containerWidth = servicesBody.offsetWidth;
+                            const offsetLeft = targetElement.offsetLeft;
+                            const targetX = offsetLeft + targetWidth - containerWidth;
+                            const totalScrollableWidth = servicesBody.scrollWidth - servicesBody.offsetWidth;
+                            const scrollTriggerProgress = targetX / totalScrollableWidth;
+                            const scrollTriggerInstance = ScrollTrigger.getById("servicesTrigger");
+                            const totalScrollableHeight = scrollTriggerInstance.end - scrollTriggerInstance.start;
+                            const targetScrollY = scrollTriggerInstance.start + scrollTriggerProgress * totalScrollableHeight;
+                            gsap.to(window, {
+                                scrollTo: {
+                                    y: targetScrollY
+                                },
+                                duration: 1,
+                                ease: "none"
+                            });
+                        }
+                    }));
+                }));
+                gsap.to(servicesBody, {
+                    x: () => -(servicesBody.scrollWidth - servicesBody.offsetWidth),
+                    ease: "none",
+                    scrollTrigger: {
+                        id: "servicesTrigger",
+                        trigger: servicesSection,
+                        start: "top 10%",
+                        end: () => `+=${(servicesBody.scrollWidth - servicesBody.offsetWidth) / 3}`,
+                        scrub: .5,
+                        pin: true
+                    }
+                });
+            }
         }
-    }
-    createAnimation();
-    window.addEventListener("orientationchange", (() => {
         createAnimation();
-        ScrollTrigger.refresh();
+    }));
+    window.addEventListener("orientationchange", (() => {
+        location.reload();
     }));
     let lastWindowWidth = window.innerWidth;
     window.addEventListener("resize", (() => {
         const currentWindowWidth = window.innerWidth;
-        if (currentWindowWidth !== lastWindowWidth) {
-            createAnimation();
-            ScrollTrigger.refresh();
-        }
+        if (currentWindowWidth !== lastWindowWidth) location.reload();
         lastWindowWidth = currentWindowWidth;
     }));
     window["FLS"] = false;
