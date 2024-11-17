@@ -1335,8 +1335,9 @@
         const startHero = Array.from(document.querySelectorAll(".start-hero__item"));
         const heroFirst = document.querySelector(".hero__first");
         const heroSecond = document.querySelector(".hero__second");
-        document.querySelector(".title-hero");
+        const decorLinesClip = document.querySelector(".decor__lines");
         const heroRight = document.querySelector(".hero__right");
+        const heroTitle = document.querySelector(".title-hero");
         const heroTitleA = document.querySelectorAll(".title-hero__a .char");
         const heroTitleB = document.querySelectorAll(".title-hero__b .char");
         const heroTitleC = document.querySelectorAll(".title-hero__c .char");
@@ -1344,8 +1345,19 @@
         const servicesSection = document.querySelector(".services");
         const servicesBody = document.querySelector(".services__body");
         const itemFirstTxt = document.querySelectorAll(".item-first__txt .word .word-span");
-        document.querySelectorAll(".services__item");
+        const servicesItems = document.querySelectorAll(".services__item");
+        const navFirstItem = document.querySelectorAll(".nav-first__item");
         const navLinks = document.querySelectorAll(".nav-first__link");
+        const itemServices = document.querySelectorAll(".services__item .item-services");
+        const partnersSection = document.querySelector(".partners");
+        const partnersContainer = document.querySelector(".partners__container");
+        const partnersTitle = document.querySelector(".partners__title");
+        const partnersLists = document.querySelector(".partners__lists");
+        const partnersListItems = document.querySelectorAll(".partners__list");
+        const advisers = document.querySelector(".advisers");
+        const advisersBlock = document.querySelector(".advisers__block");
+        const portfolioSection = document.querySelector(".portfolio");
+        const portfolioContainer = document.querySelector(".portfolio__container");
         function createAnimation() {
             gsap.set(logoImg, {
                 top: "50%",
@@ -1383,23 +1395,29 @@
                 top: logoHeaderPosition.top + logoHeaderPosition.height / 2,
                 ease: "none"
             });
-            if (startHero.length) gsap.to(startHero, {
-                top: "-100%",
-                opacity: 0,
-                stagger: index => index * .03,
-                scrollTrigger: {
-                    trigger: heroFirst,
-                    start: "top top",
-                    end: "bottom 20%",
-                    scrub: 1.2
-                }
-            });
-            if (heroSecond) {
+            if (startHero.length) {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: heroFirst,
+                        start: "top top",
+                        end: "bottom 20%",
+                        scrub: 1
+                    }
+                });
+                startHero.forEach(((el, index) => {
+                    tl.to(el, {
+                        top: "-100%",
+                        opacity: 0,
+                        duration: 1 / (3 - index)
+                    }, 0);
+                }));
+            }
+            if (heroTitle) {
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: heroSecond,
-                        start: "top center",
-                        end: "140% bottom",
+                        start: "top 60%",
+                        end: "160% bottom",
                         scrub: 1.2
                     }
                 });
@@ -1443,6 +1461,8 @@
                     stagger: .05,
                     ease: "power2.out"
                 }, "-=0.5");
+            }
+            if (heroRight) {
                 const tl2 = gsap.timeline({
                     scrollTrigger: {
                         trigger: heroSecond,
@@ -1456,9 +1476,30 @@
                     left: "0%",
                     ease: "power2.out"
                 });
+                gsap.to(heroRight, {
+                    opacity: 0,
+                    scrollTrigger: {
+                        trigger: servicesSection,
+                        start: "top 40%",
+                        end: "bottom bottom",
+                        scrub: 1.2
+                    }
+                });
+                gsap.to(decorLinesClip, {
+                    "--y1": "100%",
+                    "--y2": "100%",
+                    left: 0,
+                    opacity: 1,
+                    scrollTrigger: {
+                        trigger: heroSecond,
+                        start: "center 70%",
+                        end: "90% bottom",
+                        scrub: 1.2
+                    }
+                });
             }
             if (servicesSection) {
-                gsap.to(itemFirstTxt, {
+                if (itemFirstTxt) gsap.to(itemFirstTxt, {
                     y: "0%",
                     opacity: 1,
                     stagger: index => index * .05,
@@ -1469,13 +1510,14 @@
                         scrub: 1
                     }
                 });
-                gsap.to(heroRight, {
-                    opacity: 0,
+                if (navFirstItem) gsap.to(navFirstItem, {
+                    opacity: 1,
+                    stagger: index => index * .05,
                     scrollTrigger: {
                         trigger: servicesSection,
-                        start: "top 20%",
-                        end: "bottom bottom",
-                        scrub: 1.2
+                        start: "top center",
+                        end: "80% bottom",
+                        scrub: 1
                     }
                 });
                 navLinks.forEach((link => {
@@ -1497,13 +1539,12 @@
                                 scrollTo: {
                                     y: targetScrollY
                                 },
-                                duration: 1,
                                 ease: "none"
                             });
                         }
                     }));
                 }));
-                gsap.to(servicesBody, {
+                let scrollTween = gsap.to(servicesBody, {
                     x: () => -(servicesBody.scrollWidth - servicesBody.offsetWidth),
                     ease: "none",
                     scrollTrigger: {
@@ -1515,7 +1556,102 @@
                         pin: true
                     }
                 });
+                gsap.set(itemServices, {
+                    scale: .5,
+                    y: 50
+                });
+                servicesItems.forEach(((servicesItem, index) => {
+                    const target = itemServices[index];
+                    if (target) gsap.to(target, {
+                        scale: 1,
+                        y: 0,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: servicesItem,
+                            containerAnimation: scrollTween,
+                            start: "80% bottom",
+                            end: "bottom top",
+                            scrub: .5,
+                            id: `item-services-${index}`
+                        }
+                    });
+                }));
+                gsap.to(servicesBody, {
+                    left: "-60%",
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: servicesSection,
+                        start: () => ScrollTrigger.getById("servicesTrigger").end,
+                        end: () => ScrollTrigger.getById("servicesTrigger").end + 1e3,
+                        scrub: .5
+                    }
+                });
             }
+            if (partnersSection) {
+                gsap.to(partnersTitle, {
+                    backgroundSize: "100% 100%",
+                    scrollTrigger: {
+                        trigger: partnersSection,
+                        start: "20% bottom",
+                        end: "top center",
+                        scrub: 1
+                    }
+                });
+                const tl3 = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: partnersSection,
+                        start: "top bottom",
+                        end: "200% bottom",
+                        scrub: 1
+                    }
+                });
+                tl3.to(partnersContainer, {
+                    left: "0%",
+                    ease: "none"
+                });
+                tl3.to(partnersContainer, {
+                    left: "-50%",
+                    ease: "none"
+                });
+                gsap.to(partnersLists, {
+                    top: 0,
+                    scrollTrigger: {
+                        trigger: partnersSection,
+                        start: "top bottom",
+                        end: "top top",
+                        scrub: 1
+                    }
+                });
+                gsap.to(partnersListItems, {
+                    top: 0,
+                    scrollTrigger: {
+                        trigger: partnersSection,
+                        start: "top bottom",
+                        end: "top top",
+                        scrub: 1
+                    }
+                });
+                gsap.to(advisersBlock, {
+                    top: 0,
+                    scrollTrigger: {
+                        trigger: advisers,
+                        start: "top bottom",
+                        end: "bottom bottom",
+                        scrub: 1
+                    }
+                });
+            }
+            if (portfolioSection) gsap.to(portfolioContainer, {
+                left: "0%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: portfolioSection,
+                    start: "top bottom",
+                    end: "top top",
+                    scrub: 1,
+                    markers: true
+                }
+            });
         }
         createAnimation();
     }));

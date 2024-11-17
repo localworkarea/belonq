@@ -57,5 +57,13 @@ body {
   min-height: 100svh;
 }
 
-
+.title-main {
+ 
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  @include adaptiveValue("font-size", 256,128,2,3840,1920.98);
+  @include adaptiveValue("font-size", 128,60,3,1920.98,1024.98);
+}
 

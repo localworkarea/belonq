@@ -131,6 +131,7 @@ gsap.ticker.lagSmoothing(0)
 window.addEventListener('DOMContentLoaded', () => {
   gsap.registerPlugin(ScrollTrigger);
   gsap.registerPlugin(ScrollToPlugin);
+  // gsap.registerPlugin(MotionPathPlugin)
 
   // == GSAP ANIMATIONS ======================================================
   const logoHeader = document.querySelector('.header__logo');
@@ -141,10 +142,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const heroFirst = document.querySelector('.hero__first');
   
   const heroSecond = document.querySelector('.hero__second'); 
-  
-  const heroTitle = document.querySelector('.title-hero');
+  const decorLinesClip = document.querySelector('.decor__lines'); 
   
   const heroRight = document.querySelector('.hero__right');
+  
+  const heroTitle = document.querySelector('.title-hero');
   const heroTitleA = document.querySelectorAll('.title-hero__a .char');
   const heroTitleB = document.querySelectorAll('.title-hero__b .char');
   const heroTitleC = document.querySelectorAll('.title-hero__c .char');
@@ -154,7 +156,24 @@ window.addEventListener('DOMContentLoaded', () => {
   const servicesBody = document.querySelector('.services__body');
   const itemFirstTxt = document.querySelectorAll('.item-first__txt .word .word-span');
   const servicesItems = document.querySelectorAll('.services__item');
+  const navFirstItem = document.querySelectorAll('.nav-first__item');
   const navLinks = document.querySelectorAll('.nav-first__link');
+
+  const itemServices = document.querySelectorAll('.services__item .item-services');
+
+  // PARTNERS ---
+  const partnersSection = document.querySelector('.partners');
+  const partnersContainer = document.querySelector('.partners__container');
+  const partnersTitle = document.querySelector('.partners__title');
+  const partnersLists = document.querySelector('.partners__lists');
+  const partnersListItems = document.querySelectorAll('.partners__list');
+  const advisers = document.querySelector('.advisers');
+  const advisersBlock = document.querySelector('.advisers__block');
+
+  // PORTFOLIO ---
+  const portfolioSection = document.querySelector('.portfolio');
+  const portfolioContainer = document.querySelector('.portfolio__container');
+
 
   
   function createAnimation() {
@@ -211,29 +230,34 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     // ---------------------------------------------
   
-    // == START HERO ===================================================
+    // == START HERO (counter) ===================================================
     if (startHero.length) {
-      gsap.to(startHero, {
-        top: "-100%",
-        opacity: 0,
-        stagger: (index) => index * 0.03,
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: heroFirst,
           start: "top top",
           end: "bottom 20%",
-          scrub: 1.2,
-          // markers: true,
+          scrub: 1,
         },
       });
+      
+      startHero.forEach((el, index) => {
+        tl.to(el, {
+          top: "-100%",
+          opacity: 0,
+          duration: 1 / (3 - index), // Уменьшаем длительность для более быстрого элемента
+        }, 0); // Все анимации стартуют одновременно
+      });
+      
     }
   
     // == TITLE HERO ===================================================
-    if (heroSecond) {
+    if (heroTitle) {
     const tl = gsap.timeline({
         scrollTrigger: {
           trigger: heroSecond,
-          start: "top center",
-          end: "140% bottom",
+          start: "top 60%",
+          end: "160% bottom",
           scrub: 1.2,
           // markers: true,
         }
@@ -292,9 +316,10 @@ window.addEventListener('DOMContentLoaded', () => {
         // duration: 2,
         ease: "power2.out"
       }, "-=0.5")
-  
-  
-      // == PANDA HERO =========
+    }
+
+    // == HERO RIGHT (Panda, Lines) =========================
+    if (heroRight) {
       const tl2 = gsap.timeline({
         scrollTrigger: {
           trigger: heroSecond,
@@ -310,34 +335,93 @@ window.addEventListener('DOMContentLoaded', () => {
         ease: "power2.out",
       });
 
-    }
-  
-    // == SERVICES ======================================
-    if (servicesSection) {
-      gsap.to(itemFirstTxt, {
-        y: "0%",
-        opacity: 1,
-        stagger: (index) => index * 0.05,
-        scrollTrigger: {
-          trigger: servicesSection,
-          start: "top 60%",
-          end: "80% bottom",
-          scrub: 1,
-          // markers: true,
-        },
-      });
-
-      gsap.to(heroRight, {
+       // == PANDA OPACITY 0 ==============
+       gsap.to(heroRight, {
         opacity: 0,
         scrollTrigger: {
           trigger: servicesSection,
-          start: "top 20%",
+          start: "top 40%",
           end: "bottom bottom",
           scrub: 1.2,
           // markers: true,
         },
       });
+      // ------------------------------
 
+        // Через плагин MotionPath
+      // const points = { 
+      //   y3: 80, 
+      //   y4: 50,
+      // };
+      
+      // gsap.to(points, {
+      //   y3: 0, 
+      //   y4: 0,
+      //   ease: "power2.out",
+      //   scrollTrigger: {
+      //     trigger: heroSecond, 
+      //     start: "center 70%", 
+      //     end: "bottom bottom", 
+      //     scrub: 1.2, 
+      //     markers: true,
+      //   },
+      //   onUpdate: () => {
+      //     decorLinesClip.style.clipPath = `polygon(0 100%, 100% 100%, 100% ${points.y3}%, 0 ${points.y4}%)`;
+      //   }
+      // });
+
+      gsap.to(decorLinesClip , {
+        "--y1": "100%",
+        "--y2": "100%",
+        left: 0,
+        opacity: 1,
+        // ease: "power2.out",
+        scrollTrigger: {
+          trigger: heroSecond,
+          start: "center 70%",
+          end: "90% bottom",
+          scrub: 1.2,
+          // markers: true,
+        },
+      });
+      
+
+    }
+  
+    // == SERVICES ======================================
+    if (servicesSection) {
+
+      if (itemFirstTxt) {
+        gsap.to(itemFirstTxt, {
+          y: "0%",
+          opacity: 1,
+          stagger: (index) => index * 0.05,
+          scrollTrigger: {
+            trigger: servicesSection,
+            start: "top 60%",
+            end: "80% bottom",
+            scrub: 1,
+            // markers: true,
+          },
+        });
+      }
+  
+      if (navFirstItem) {
+        gsap.to(navFirstItem, {
+          opacity: 1,
+          stagger: (index) => index * 0.05,
+          scrollTrigger: {
+            trigger: servicesSection,
+            start: "top center",
+            end: "80% bottom",
+            scrub: 1,
+            // markers: true,
+          },
+        });
+        
+      }
+
+      // == NAVIGATION, SCROLL TO EL
       navLinks.forEach(link => {
         link.addEventListener('click', (event) => {
           event.preventDefault();
@@ -366,30 +450,149 @@ window.addEventListener('DOMContentLoaded', () => {
             // Прокручиваем страницу вертикально
             gsap.to(window, {
               scrollTo: { y: targetScrollY },
-              duration: 1,
+              // duration: 0.5,
               ease: "none",
             });
           }
         });
       });
-      gsap.to(servicesBody, {
-        x: () => -(servicesBody.scrollWidth - servicesBody.offsetWidth), // Прокрутить до конца вправо
-         ease: "none",
+  
+      // === MOVE HORIZONTAL SCROLL ===============
+      let scrollTween = gsap.to(servicesBody, {
+        x: () => -(servicesBody.scrollWidth - servicesBody.offsetWidth),
+        ease: "none",
         scrollTrigger: {
           id: "servicesTrigger",
           trigger: servicesSection,
           start: "top 10%",
-          end: () => `+=${(servicesBody.scrollWidth - servicesBody.offsetWidth) / 3}`, // Анимация заканчивается в зависимости от ширины
+          end: () => `+=${(servicesBody.scrollWidth - servicesBody.offsetWidth) / 3}`,
           scrub: 0.5,
           pin: true,
+        },
+      });
+      
+      // === itemServices Animation on scroll ==================
+      gsap.set(itemServices, { scale: 0.5, y: 50 });
+      servicesItems.forEach((servicesItem, index) => {
+        const target = itemServices[index];
+        if (target) {
+          gsap.to(target, {
+            scale: 1,
+            y: 0,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: servicesItem,
+              containerAnimation: scrollTween,
+              start: "80% bottom",  // Начало анимации
+              end: "bottom top",    // Конец анимации
+              scrub: 0.5,
+              // markers: true,
+              id: `item-services-${index}`,
+            }
+          });
+        }
+      });
+
+      gsap.to(servicesBody, {
+        left: "-60%",
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: servicesSection,
+          start: () => ScrollTrigger.getById("servicesTrigger").end,
+          end: () => ScrollTrigger.getById("servicesTrigger").end + 1000, 
+          scrub: 0.5,
+        },
+      });
+
+    } // ---
+
+
+    // == SERVICES ======================================
+    if (partnersSection) {
+
+      gsap.to(partnersTitle, {
+        backgroundSize: "100% 100%",
+        scrollTrigger: {
+          trigger: partnersSection,
+          start: "20% bottom",
+          end: "top center",
+          scrub: 1,
           // markers: true,
         },
       });
 
 
+      const tl3 = gsap.timeline({
+        scrollTrigger: {
+          trigger: partnersSection,
+          start: "top bottom",
+          end: "200% bottom",
+          scrub: 1,
+          // markers: true,
+        }
+      });
+      
+      tl3.to(partnersContainer, {
+        left: "0%",
+        ease: "none",
+      });
+      tl3.to(partnersContainer, {
+        left: "-50%",
+        ease: "none",
+      });
+
+      gsap.to(partnersLists, {
+        top: 0,
+        scrollTrigger: {
+          trigger: partnersSection,
+          start: "top bottom",
+          end: "top top",
+          scrub: 1,
+        },
+      });
+
+      gsap.to(partnersListItems, {
+        top: 0,
+        scrollTrigger: {
+          trigger: partnersSection,
+          start: "top bottom",
+          end: "top top",
+          scrub: 1,
+        },
+      });
+
+      gsap.to(advisersBlock, {
+        top: 0,
+        scrollTrigger: {
+          trigger: advisers,
+          start: "top bottom",
+          end: "bottom bottom",
+          scrub: 1,
+        },
+      });
+
+
+
+
+    } // ----
+
+    // == PORTFOLIO ======================================
+    if (portfolioSection) {
+      gsap.to(portfolioContainer, {
+        left: "0%",
+        ease: "none",
+        scrollTrigger: {
+          trigger: portfolioSection,
+          start: "top bottom",
+          end: "top top",
+          scrub: 1,
+          markers: true,
+        },
+      });
     }
- 
-  
+
+
+
   }
   
   createAnimation();

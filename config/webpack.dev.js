@@ -53,7 +53,7 @@ const config = {
 		compress: true,
 		port: 'auto',
 		hot: true,
-		host: '192.168.0.103', // localhost
+		host: '192.168.0.104', // localhost
 		//В режимі розробника папка 
 		// результатом (dist) буде створюватися на диску)
 		//devMiddleware: {
