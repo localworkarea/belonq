@@ -67,3 +67,27 @@ body {
   @include adaptiveValue("font-size", 128,60,3,1920.98,1024.98);
 }
 
+
+// .scroll-btn {
+//   position: fixed;
+//   bottom: 0;
+//   left: 0;
+//   z-index: 19;
+//   display: grid;
+//   place-items: center;
+//   svg {
+
+//      path {
+//       fill: #fff;
+//       stroke: #fff;
+//      }
+//   }
+//   // схвалитились за кнопку
+//   &._dwn {}
+//   // нажали движение
+//   &._move {}
+//   // движение вниз
+//   &._move-up {}
+//   // движение вверх
+//   &._move-dwn {}
+// }

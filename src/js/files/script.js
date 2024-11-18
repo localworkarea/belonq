@@ -133,6 +133,11 @@ window.addEventListener('DOMContentLoaded', () => {
   gsap.registerPlugin(ScrollToPlugin);
   // gsap.registerPlugin(MotionPathPlugin)
 
+
+
+
+
+
   // == GSAP ANIMATIONS ======================================================
   const logoHeader = document.querySelector('.header__logo');
   const logoImg = document.querySelector('.logo__ic');
@@ -495,12 +500,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
       gsap.to(servicesBody, {
         left: "-60%",
-        ease: "power2.out",
+        ease: "none",
         scrollTrigger: {
           trigger: servicesSection,
           start: () => ScrollTrigger.getById("servicesTrigger").end,
           end: () => ScrollTrigger.getById("servicesTrigger").end + 1000, 
-          scrub: 0.5,
+          scrub: 1,
         },
       });
 
@@ -509,20 +514,35 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // == SERVICES ======================================
     if (partnersSection) {
+      // gsap.to(partnersTitle, {
+      //   backgroundSize: "100% 100%",
+      //   scrollTrigger: {
+      //     trigger: partnersSection,
+      //     start: "20% bottom",
+      //     end: "top center",
+      //     scrub: 1.2,
+      //     // markers: true,
+      //   },
+      // });
 
-      gsap.to(partnersTitle, {
-        backgroundSize: "100% 100%",
+      gsap.timeline({
         scrollTrigger: {
           trigger: partnersSection,
-          start: "20% bottom",
-          end: "top center",
-          scrub: 1,
+          start: "10% bottom",
+          end: "bottom center",
+          scrub: 1.2,
           // markers: true,
         },
+      })
+      .to(partnersTitle, {
+        backgroundSize: "100% 100%",
+      })
+      .to(partnersTitle, {
+        backgroundSize: "100% 0%",
       });
 
 
-      const tl3 = gsap.timeline({
+     gsap.timeline({
         scrollTrigger: {
           trigger: partnersSection,
           start: "top bottom",
@@ -530,13 +550,12 @@ window.addEventListener('DOMContentLoaded', () => {
           scrub: 1,
           // markers: true,
         }
-      });
-      
-      tl3.to(partnersContainer, {
+      })
+      .to(partnersContainer, {
         left: "0%",
         ease: "none",
-      });
-      tl3.to(partnersContainer, {
+      })
+      .to(partnersContainer, {
         left: "-50%",
         ease: "none",
       });
@@ -563,6 +582,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       gsap.to(advisersBlock, {
         top: 0,
+        opacity: 1,
         scrollTrigger: {
           trigger: advisers,
           start: "top bottom",
@@ -586,7 +606,7 @@ window.addEventListener('DOMContentLoaded', () => {
           start: "top bottom",
           end: "top top",
           scrub: 1,
-          markers: true,
+          // markers: true,
         },
       });
     }
@@ -637,3 +657,107 @@ if (currentWindowWidth !== lastWindowWidth) {
 }
 lastWindowWidth = currentWindowWidth;
 });
+
+
+
+
+
+
+  // // == button scroll-bar ==============
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   const scrollBtn = document.querySelector('.scroll-btn');
+  //   let isDragging = false;
+  //   let startY = 0;
+  //   let startScrollTop = 0;
+  
+  //   const onMouseMove = (e) => {
+  //     if (!isDragging) return;
+  //     const deltaY = e.clientY - startY;
+  //     const scrollAmount = deltaY * 2; // Коэффициент увеличения прокрутки
+  
+  //     // Меняем направление движения, если оно изменилось
+  //     if (deltaY > 0) {
+  //       if (!scrollBtn.classList.contains('_move-dwn')) {
+  //         scrollBtn.classList.add('_move-dwn');
+  //         scrollBtn.classList.remove('_move-up');
+  //       }
+  //     } else {
+  //       if (!scrollBtn.classList.contains('_move-up')) {
+  //         scrollBtn.classList.add('_move-up');
+  //         scrollBtn.classList.remove('_move-dwn');
+  //       }
+  //     }
+  
+  //     document.documentElement.scrollTop = startScrollTop + scrollAmount;
+  //     scrollBtn.classList.add('_move');
+  //   };
+  
+  //   const onMouseUp = () => {
+  //     isDragging = false;
+  //     document.removeEventListener('mousemove', onMouseMove);
+  //     document.removeEventListener('mouseup', onMouseUp);
+  
+  //     // Удаляем класс _move, но сохраняем направление
+  //     scrollBtn.classList.remove('_dwn', '_move');
+  //   };
+  
+  //   const onMouseDown = (e) => {
+  //     isDragging = true;
+  //     startY = e.clientY;
+  //     startScrollTop = document.documentElement.scrollTop;
+  //     document.addEventListener('mousemove', onMouseMove);
+  //     document.addEventListener('mouseup', onMouseUp);
+  
+  //     // Добавляем класс при нажатии
+  //     scrollBtn.classList.add('_dwn');
+  //   };
+  
+  //   scrollBtn.addEventListener('mousedown', onMouseDown);
+  
+  //   // Для touch-событий на мобильных устройствах
+  //   const onTouchMove = (e) => {
+  //     if (!isDragging) return;
+  //     const touchY = e.touches[0].clientY;
+  //     const deltaY = touchY - startY;
+  //     const scrollAmount = deltaY * 2;
+  
+  //     // Меняем направление движения, если оно изменилось
+  //     if (deltaY > 0) {
+  //       if (!scrollBtn.classList.contains('_move-dwn')) {
+  //         scrollBtn.classList.add('_move-dwn');
+  //         scrollBtn.classList.remove('_move-up');
+  //       }
+  //     } else {
+  //       if (!scrollBtn.classList.contains('_move-up')) {
+  //         scrollBtn.classList.add('_move-up');
+  //         scrollBtn.classList.remove('_move-dwn');
+  //       }
+  //     }
+  
+  //     document.documentElement.scrollTop = startScrollTop + scrollAmount;
+  //     scrollBtn.classList.add('_move');
+  //   };
+  
+  //   const onTouchEnd = () => {
+  //     isDragging = false;
+  //     document.removeEventListener('touchmove', onTouchMove);
+  //     document.removeEventListener('touchend', onTouchEnd);
+  
+  //     // Удаляем класс _move, но сохраняем направление
+  //     scrollBtn.classList.remove('_dwn', '_move');
+  //   };
+  
+  //   const onTouchStart = (e) => {
+  //     isDragging = true;
+  //     startY = e.touches[0].clientY;
+  //     startScrollTop = document.documentElement.scrollTop;
+  //     document.addEventListener('touchmove', onTouchMove);
+  //     document.addEventListener('touchend', onTouchEnd);
+  
+  //     // Добавляем класс при нажатии
+  //     scrollBtn.classList.add('_dwn');
+  //   };
+  
+  //   scrollBtn.addEventListener('touchstart', onTouchStart);
+  // });
+  

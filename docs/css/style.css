@@ -396,9 +396,6 @@ body {
   -webkit-transform: rotate(45deg);
   transform: rotate(45deg)
 }
-section {
-  border-bottom: .125rem solid rgba(255,255,255,.185)
-}
 .hero {
   position: relative;
   z-index: 2
@@ -731,7 +728,7 @@ section {
   background-repeat: no-repeat;
   background-size: 0 100%;
   background-attachment: scroll;
-  -webkit-text-fill-color: rgba(254,237,1,.15);
+  -webkit-text-fill-color: rgba(254,237,1,.1);
   background-image: linear-gradient(#fdda04,#fdda04)
 }
 .partners__lists {
@@ -776,7 +773,8 @@ section {
 }
 .advisers__block {
   position: relative;
-  top: 50%
+  top: 50%;
+  opacity: 0
 }
 .advisers__head {
   max-width: 50%

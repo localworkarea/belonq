@@ -1578,38 +1578,39 @@
                 }));
                 gsap.to(servicesBody, {
                     left: "-60%",
-                    ease: "power2.out",
+                    ease: "none",
                     scrollTrigger: {
                         trigger: servicesSection,
                         start: () => ScrollTrigger.getById("servicesTrigger").end,
                         end: () => ScrollTrigger.getById("servicesTrigger").end + 1e3,
-                        scrub: .5
+                        scrub: 1
                     }
                 });
             }
             if (partnersSection) {
-                gsap.to(partnersTitle, {
-                    backgroundSize: "100% 100%",
+                gsap.timeline({
                     scrollTrigger: {
                         trigger: partnersSection,
-                        start: "20% bottom",
-                        end: "top center",
-                        scrub: 1
+                        start: "10% bottom",
+                        end: "bottom center",
+                        scrub: 1.2
                     }
+                }).to(partnersTitle, {
+                    backgroundSize: "100% 100%"
+                }).to(partnersTitle, {
+                    backgroundSize: "100% 0%"
                 });
-                const tl3 = gsap.timeline({
+                gsap.timeline({
                     scrollTrigger: {
                         trigger: partnersSection,
                         start: "top bottom",
                         end: "200% bottom",
                         scrub: 1
                     }
-                });
-                tl3.to(partnersContainer, {
+                }).to(partnersContainer, {
                     left: "0%",
                     ease: "none"
-                });
-                tl3.to(partnersContainer, {
+                }).to(partnersContainer, {
                     left: "-50%",
                     ease: "none"
                 });
@@ -1633,6 +1634,7 @@
                 });
                 gsap.to(advisersBlock, {
                     top: 0,
+                    opacity: 1,
                     scrollTrigger: {
                         trigger: advisers,
                         start: "top bottom",
@@ -1648,8 +1650,7 @@
                     trigger: portfolioSection,
                     start: "top bottom",
                     end: "top top",
-                    scrub: 1,
-                    markers: true
+                    scrub: 1
                 }
             });
         }
