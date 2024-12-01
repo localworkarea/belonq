@@ -1,5 +1,6 @@
 (() => {
     "use strict";
+    const modules_flsModules = {};
     function addLoadedClass() {
         if (!document.documentElement.classList.contains("loading")) window.addEventListener("load", (function() {
             setTimeout((function() {
@@ -56,7 +57,137 @@
             }
         }));
     }
+    function getDigFormat(item, sepp = " ") {
+        return item.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, `$1${sepp}`);
+    }
+    function uniqArray(array) {
+        return array.filter((function(item, index, self) {
+            return self.indexOf(item) === index;
+        }));
+    }
+    class ScrollWatcher {
+        constructor(props) {
+            let defaultConfig = {
+                logging: true
+            };
+            this.config = Object.assign(defaultConfig, props);
+            this.observer;
+            !document.documentElement.classList.contains("watcher") ? this.scrollWatcherRun() : null;
+        }
+        scrollWatcherUpdate() {
+            this.scrollWatcherRun();
+        }
+        scrollWatcherRun() {
+            document.documentElement.classList.add("watcher");
+            this.scrollWatcherConstructor(document.querySelectorAll("[data-watch]"));
+        }
+        scrollWatcherConstructor(items) {
+            if (items.length) {
+                let uniqParams = uniqArray(Array.from(items).map((function(item) {
+                    if (item.dataset.watch === "navigator" && !item.dataset.watchThreshold) {
+                        let valueOfThreshold;
+                        if (item.clientHeight > 2) {
+                            valueOfThreshold = window.innerHeight / 2 / (item.clientHeight - 1);
+                            if (valueOfThreshold > 1) valueOfThreshold = 1;
+                        } else valueOfThreshold = 1;
+                        item.setAttribute("data-watch-threshold", valueOfThreshold.toFixed(2));
+                    }
+                    return `${item.dataset.watchRoot ? item.dataset.watchRoot : null}|${item.dataset.watchMargin ? item.dataset.watchMargin : "0px"}|${item.dataset.watchThreshold ? item.dataset.watchThreshold : 0}`;
+                })));
+                uniqParams.forEach((uniqParam => {
+                    let uniqParamArray = uniqParam.split("|");
+                    let paramsWatch = {
+                        root: uniqParamArray[0],
+                        margin: uniqParamArray[1],
+                        threshold: uniqParamArray[2]
+                    };
+                    let groupItems = Array.from(items).filter((function(item) {
+                        let watchRoot = item.dataset.watchRoot ? item.dataset.watchRoot : null;
+                        let watchMargin = item.dataset.watchMargin ? item.dataset.watchMargin : "0px";
+                        let watchThreshold = item.dataset.watchThreshold ? item.dataset.watchThreshold : 0;
+                        if (String(watchRoot) === paramsWatch.root && String(watchMargin) === paramsWatch.margin && String(watchThreshold) === paramsWatch.threshold) return item;
+                    }));
+                    let configWatcher = this.getScrollWatcherConfig(paramsWatch);
+                    this.scrollWatcherInit(groupItems, configWatcher);
+                }));
+            }
+        }
+        getScrollWatcherConfig(paramsWatch) {
+            let configWatcher = {};
+            if (document.querySelector(paramsWatch.root)) configWatcher.root = document.querySelector(paramsWatch.root);
+            configWatcher.rootMargin = paramsWatch.margin;
+            if (paramsWatch.margin.indexOf("px") < 0 && paramsWatch.margin.indexOf("%") < 0) return;
+            if (paramsWatch.threshold === "prx") {
+                paramsWatch.threshold = [];
+                for (let i = 0; i <= 1; i += .005) paramsWatch.threshold.push(i);
+            } else paramsWatch.threshold = paramsWatch.threshold.split(",");
+            configWatcher.threshold = paramsWatch.threshold;
+            return configWatcher;
+        }
+        scrollWatcherCreate(configWatcher) {
+            console.log(configWatcher);
+            this.observer = new IntersectionObserver(((entries, observer) => {
+                entries.forEach((entry => {
+                    this.scrollWatcherCallback(entry, observer);
+                }));
+            }), configWatcher);
+        }
+        scrollWatcherInit(items, configWatcher) {
+            this.scrollWatcherCreate(configWatcher);
+            items.forEach((item => this.observer.observe(item)));
+        }
+        scrollWatcherIntersecting(entry, targetElement) {
+            if (entry.isIntersecting) !targetElement.classList.contains("_watcher-view") ? targetElement.classList.add("_watcher-view") : null; else targetElement.classList.contains("_watcher-view") ? targetElement.classList.remove("_watcher-view") : null;
+        }
+        scrollWatcherOff(targetElement, observer) {
+            observer.unobserve(targetElement);
+        }
+        scrollWatcherCallback(entry, observer) {
+            const targetElement = entry.target;
+            this.scrollWatcherIntersecting(entry, targetElement);
+            targetElement.hasAttribute("data-watch-once") && entry.isIntersecting ? this.scrollWatcherOff(targetElement, observer) : null;
+            document.dispatchEvent(new CustomEvent("watcherCallback", {
+                detail: {
+                    entry
+                }
+            }));
+        }
+    }
+    modules_flsModules.watcher = new ScrollWatcher({});
     let addWindowScrollEvent = false;
+    function digitsCounter() {
+        function digitsCountersInit(digitsCountersItems) {
+            let digitsCounters = digitsCountersItems ? digitsCountersItems : document.querySelectorAll("[data-digits-counter]");
+            if (digitsCounters.length) digitsCounters.forEach((digitsCounter => {
+                if (digitsCounter.hasAttribute("data-go")) return;
+                digitsCounter.setAttribute("data-go", "");
+                digitsCounter.dataset.digitsCounter = digitsCounter.innerHTML;
+                digitsCounter.innerHTML = `0`;
+                digitsCountersAnimate(digitsCounter);
+            }));
+        }
+        function digitsCountersAnimate(digitsCounter) {
+            let startTimestamp = null;
+            const duration = parseFloat(digitsCounter.dataset.digitsCounterSpeed) ? parseFloat(digitsCounter.dataset.digitsCounterSpeed) : 1e3;
+            const startValue = parseFloat(digitsCounter.dataset.digitsCounter);
+            const format = digitsCounter.dataset.digitsCounterFormat ? digitsCounter.dataset.digitsCounterFormat : " ";
+            const startPosition = 0;
+            const step = timestamp => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (startPosition + startValue));
+                digitsCounter.innerHTML = typeof digitsCounter.dataset.digitsCounterFormat !== "undefined" ? getDigFormat(value, format) : value;
+                if (progress < 1) window.requestAnimationFrame(step); else digitsCounter.removeAttribute("data-go");
+            };
+            window.requestAnimationFrame(step);
+        }
+        function digitsCounterAction(e) {
+            const entry = e.detail.entry;
+            const targetElement = entry.target;
+            if (targetElement.querySelectorAll("[data-digits-counter]").length) digitsCountersInit(targetElement.querySelectorAll("[data-digits-counter]"));
+        }
+        document.addEventListener("watcherCallback", digitsCounterAction);
+    }
     setTimeout((() => {
         if (addWindowScrollEvent) {
             let windowScroll = new Event("windowScroll");
@@ -1258,63 +1389,6 @@
         } ]);
         return SplitType;
     }();
-    const splitTextLines = document.querySelectorAll(".split-lines");
-    const splitTextWords = document.querySelectorAll(".split-words");
-    const splitTextChars = document.querySelectorAll(".split-chars");
-    const splitTextCharsSpan = document.querySelectorAll(".split-chars-span");
-    const splitTextBoth = document.querySelectorAll(".split-both");
-    const splitSetSpan = document.querySelectorAll(".split-words.set-span");
-    function initSplitType() {
-        if (splitTextLines.length > 0) splitTextLines.forEach((element => {
-            new SplitType(element, {
-                types: "lines"
-            });
-        }));
-        if (splitTextWords.length > 0) splitTextWords.forEach((element => {
-            new SplitType(element, {
-                types: "words"
-            });
-            const words = element.querySelectorAll(".word");
-            words.forEach(((word, index) => {
-                word.style.setProperty("--index", index);
-            }));
-        }));
-        if (splitTextChars.length > 0) splitTextChars.forEach((element => {
-            new SplitType(element, {
-                types: "chars"
-            });
-            const chars = element.querySelectorAll(".char");
-            chars.forEach(((char, index) => {
-                char.style.setProperty("--index", index);
-            }));
-        }));
-        if (splitTextCharsSpan.length > 0) splitTextCharsSpan.forEach((elementSpan => {
-            const splitInstance = new SplitType(elementSpan, {
-                types: "chars"
-            });
-            splitInstance.chars.forEach(((char, index) => {
-                const textContent = char.textContent.trim();
-                char.innerHTML = `<span class="char-span">${textContent}</span>`;
-            }));
-        }));
-        if (splitTextBoth.length > 0) splitTextBoth.forEach((element => {
-            new SplitType(element, {
-                types: "lines, words"
-            });
-            const words = element.querySelectorAll(".word");
-            words.forEach(((word, index) => {
-                word.style.setProperty("--index", index);
-            }));
-        }));
-        if (splitSetSpan.length > 0) splitSetSpan.forEach((splitSetSpan => {
-            const words = splitSetSpan.querySelectorAll(".word");
-            words.forEach((word => {
-                const text = word.textContent.trim();
-                word.innerHTML = `<span class="word-span">${text}</span>`;
-            }));
-        }));
-    }
-    initSplitType();
     const lenis = new Lenis({
         smooth: true,
         smoothTouch: true,
@@ -1327,27 +1401,99 @@
     }));
     gsap.ticker.lagSmoothing(0);
     window.addEventListener("DOMContentLoaded", (() => {
+        function updateHeroHeight() {
+            const panda = document.querySelector(".hero__panda");
+            const hero = document.querySelector(".hero");
+            if (panda && hero) {
+                const pandaHeight = panda.offsetHeight;
+                hero.style.setProperty("--img-height", `${pandaHeight}px`);
+            }
+        }
+        updateHeroHeight();
         gsap.registerPlugin(ScrollTrigger);
         gsap.registerPlugin(ScrollToPlugin);
-        const logoHeader = document.querySelector(".header__logo");
-        const logoImg = document.querySelector(".logo__ic");
+        function initSplitType() {
+            const splitElements = [ {
+                selector: ".split-lines",
+                options: {
+                    types: "lines"
+                }
+            }, {
+                selector: ".split-words",
+                options: {
+                    types: "words"
+                },
+                applyIndex: true
+            }, {
+                selector: ".split-chars",
+                options: {
+                    types: "chars"
+                },
+                applyIndex: true
+            }, {
+                selector: ".split-chars-span",
+                options: {
+                    types: "chars"
+                },
+                wrapSpan: true
+            }, {
+                selector: ".split-both",
+                options: {
+                    types: "lines, words"
+                },
+                applyIndex: true
+            }, {
+                selector: ".split-words.set-span",
+                wrapWords: true
+            } ];
+            splitElements.forEach((({selector, options, applyIndex, wrapSpan, wrapWords}) => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach((element => {
+                    const splitInstance = new SplitType(element, options);
+                    if (applyIndex) {
+                        const items = element.querySelectorAll(options.types.includes("words") ? ".word" : ".char");
+                        items.forEach(((item, index) => item.style.setProperty("--index", index)));
+                    }
+                    if (wrapSpan) splitInstance.chars.forEach((char => {
+                        char.innerHTML = `<span class="char-span">${char.textContent.trim()}</span>`;
+                    }));
+                    if (wrapWords) {
+                        const words = element.querySelectorAll(".word");
+                        words.forEach(((word, index) => {
+                            word.innerHTML = `<span class="word-span" style="--index: ${index}">${word.textContent.trim()}</span>`;
+                        }));
+                    }
+                }));
+            }));
+        }
+        initSplitType();
+        ScrollTrigger.refresh();
+        let lastWidth = window.innerWidth;
+        window.addEventListener("resize", (() => {
+            const currentWidth = window.innerWidth;
+            if (currentWidth !== lastWidth) {
+                updateHeroHeight();
+                initSplitType();
+                createAnimation();
+                ScrollTrigger.refresh();
+                lastWidth = currentWidth;
+            }
+        }));
+        document.querySelector(".header__logo");
+        document.querySelector(".logo__ic");
         const heroSection = document.querySelector(".hero");
-        const startHero = Array.from(document.querySelectorAll(".start-hero__item"));
-        const heroFirst = document.querySelector(".hero__first");
-        const heroSecond = document.querySelector(".hero__second");
-        const decorLinesClip = document.querySelector(".decor__lines");
+        document.querySelector(".hero__second");
         const heroRight = document.querySelector(".hero__right");
+        const decorLinesClip = document.querySelector(".lines");
         const heroTitle = document.querySelector(".title-hero");
-        const heroTitleA = document.querySelectorAll(".title-hero__a .char");
-        const heroTitleB = document.querySelectorAll(".title-hero__b .char");
-        const heroTitleC = document.querySelectorAll(".title-hero__c .char");
-        const heroTitleD = document.querySelectorAll(".title-hero__d .char");
+        const countHero = document.querySelector(".hero__count");
         const servicesSection = document.querySelector(".services");
         const servicesBody = document.querySelector(".services__body");
-        const itemFirstTxt = document.querySelectorAll(".item-first__txt .word .word-span");
         const servicesItems = document.querySelectorAll(".services__item");
+        const itemFirstTxts = document.querySelector(".item-first__txts");
         const navFirstItem = document.querySelectorAll(".nav-first__item");
         const navLinks = document.querySelectorAll(".nav-first__link");
+        const navTitle = document.querySelectorAll(".nav-first__title span");
         const itemServices = document.querySelectorAll(".services__item .item-services");
         const partnersSection = document.querySelector(".partners");
         const partnersContainer = document.querySelector(".partners__container");
@@ -1359,167 +1505,137 @@
         const portfolioSection = document.querySelector(".portfolio");
         const portfolioContainer = document.querySelector(".portfolio__container");
         function createAnimation() {
-            gsap.set(logoImg, {
-                top: "50%",
-                left: "50px",
-                width: "47%"
-            });
-            const scrollPosY = window.pageYOffset;
-            window.scrollTo(0, 0);
-            function getOffset(el) {
-                const rect = el.getBoundingClientRect();
-                return {
-                    top: rect.top + window.pageYOffset,
-                    left: rect.left + window.pageXOffset,
-                    width: rect.width,
-                    height: rect.height
-                };
-            }
-            const logoHeaderPosition = getOffset(logoHeader);
-            window.scrollTo(0, scrollPosY);
-            ScrollTrigger.refresh();
             ScrollTrigger.getAll().forEach((trigger => trigger.kill()));
-            gsap.to(logoImg, {
-                scrollTrigger: {
-                    trigger: heroSection,
-                    start: "top top",
-                    end: "55% center",
-                    scrub: 1,
-                    onUpdate: self => {
-                        let progress = self.progress;
-                        if (progress > .9) logoImg.classList.add("_anim-end"); else logoImg.classList.remove("_anim-end");
-                    }
-                },
-                width: logoHeaderPosition.width,
-                left: logoHeaderPosition.left,
-                top: logoHeaderPosition.top + logoHeaderPosition.height / 2,
-                ease: "none"
+            gsap.set([ navTitle, navFirstItem ], {
+                clearProps: "all"
             });
-            if (startHero.length) {
-                const tl = gsap.timeline({
+            let mm = gsap.matchMedia();
+            mm.add({
+                portrait: "(orientation: portrait)",
+                landscape: "(orientation: landscape)",
+                landscapeMax1366: `(max-width: 85.436em) and (orientation: landscape)`,
+                maxWidth488: "(max-width: 30.061em)"
+            }, (context => {
+                let {portrait, landscape, landscapeMax1366, maxWidth488} = context.conditions;
+                if (landscape) {
+                    const itemFirstTxt = document.querySelectorAll(".item-first__txt .word .word-span");
+                    if (itemFirstTxt) gsap.to(itemFirstTxt, {
+                        y: "0%",
+                        opacity: 1,
+                        stagger: index => index * .05,
+                        scrollTrigger: {
+                            trigger: servicesSection,
+                            start: "top bottom",
+                            end: "80% bottom",
+                            scrub: 1
+                        }
+                    });
+                    if (navFirstItem) {
+                        gsap.to(navTitle, {
+                            y: 0,
+                            scrollTrigger: {
+                                trigger: servicesSection,
+                                start: "top 60%",
+                                end: "top center",
+                                scrub: 1
+                            }
+                        });
+                        gsap.fromTo(navFirstItem, {
+                            opacity: 0
+                        }, {
+                            opacity: 1,
+                            stagger: index => index * .05,
+                            scrollTrigger: {
+                                trigger: servicesSection,
+                                start: "top 80%",
+                                end: "bottom bottom",
+                                scrub: 1
+                            }
+                        });
+                    }
+                }
+                if (portrait) if (itemFirstTxts) gsap.to(itemFirstTxts, {
+                    opacity: 0,
+                    left: "-20%",
                     scrollTrigger: {
-                        trigger: heroFirst,
+                        trigger: heroSection,
                         start: "top top",
-                        end: "bottom 20%",
+                        end: "bottom 40%",
                         scrub: 1
                     }
                 });
-                startHero.forEach(((el, index) => {
-                    tl.to(el, {
-                        top: "-100%",
-                        opacity: 0,
-                        duration: 1 / (3 - index)
-                    }, 0);
-                }));
-            }
+                if (landscapeMax1366) ;
+                if (maxWidth488) ;
+            }));
             if (heroTitle) {
+                const heroTitleAline = document.querySelectorAll(".title-hero .split-chars");
+                const heroTitleA = document.querySelectorAll(".title-hero__a .char");
+                const heroTitleB = document.querySelectorAll(".title-hero__b .char");
+                const heroTitleC = document.querySelectorAll(".title-hero__c .char");
+                const heroTitleD = document.querySelectorAll(".title-hero__d .char");
                 const tl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: heroSecond,
-                        start: "top 60%",
-                        end: "160% bottom",
-                        scrub: 1.2
+                        trigger: heroSection,
+                        start: "top top",
+                        end: "+=2000",
+                        scrub: 1
                     }
                 });
-                tl.to(heroTitleA, {
-                    y: "0%",
-                    stagger: .08,
+                tl.to(heroTitleAline, {
+                    y: "-100%",
+                    x: "-100%",
+                    stagger: .02,
                     ease: "power2.out"
-                }, "-=0.5");
-                tl.to(heroTitleB, {
-                    y: "0%",
-                    stagger: .08,
-                    ease: "power2.out"
-                }, "-=0.5");
-                tl.to(heroTitleC, {
-                    y: "0%",
-                    stagger: .08,
-                    ease: "power2.out"
-                }, "-=0.5");
-                tl.to(heroTitleD, {
-                    y: "0%",
-                    stagger: .08,
-                    ease: "power2.out"
-                }, "-=0.5");
-                tl.to(heroTitleA, {
+                }), tl.to(heroTitleA, {
                     opacity: "0",
-                    stagger: .05,
+                    stagger: .01,
+                    duration: .1,
                     ease: "power2.out"
-                });
-                tl.to(heroTitleB, {
+                }, "<"), tl.to(heroTitleB, {
                     opacity: "0",
-                    stagger: .05,
+                    stagger: .01,
+                    duration: .1,
                     ease: "power2.out"
-                }, "-=0.5");
-                tl.to(heroTitleC, {
+                }, "<"), tl.to(heroTitleC, {
                     opacity: "0",
-                    stagger: .05,
+                    stagger: .01,
+                    duration: .1,
                     ease: "power2.out"
-                }, "-=0.5");
-                tl.to(heroTitleD, {
+                }, "<"), tl.to(heroTitleD, {
                     opacity: "0",
-                    stagger: .05,
+                    stagger: .01,
+                    duration: .15,
                     ease: "power2.out"
-                }, "-=0.5");
+                }, "<");
             }
             if (heroRight) {
-                const tl2 = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: heroSecond,
-                        start: "top center",
-                        end: "bottom bottom",
-                        scrub: 1.2
-                    }
-                });
-                tl2.to(heroRight, {
-                    top: "0%",
-                    left: "0%",
-                    ease: "power2.out"
-                });
                 gsap.to(heroRight, {
                     opacity: 0,
+                    x: "20%",
+                    y: "-20%",
                     scrollTrigger: {
-                        trigger: servicesSection,
-                        start: "top 40%",
-                        end: "bottom bottom",
+                        trigger: heroSection,
+                        start: "top top",
+                        end: "+=1000",
                         scrub: 1.2
                     }
                 });
-                gsap.to(decorLinesClip, {
-                    "--y1": "100%",
-                    "--y2": "100%",
-                    left: 0,
-                    opacity: 1,
+                const tl4 = gsap.timeline({
                     scrollTrigger: {
-                        trigger: heroSecond,
-                        start: "center 70%",
-                        end: "90% bottom",
-                        scrub: 1.2
+                        trigger: heroSection,
+                        start: "top top",
+                        end: "bottom top",
+                        scrub: 1
                     }
                 });
+                tl4.to(decorLinesClip, {
+                    left: 0
+                });
+                tl4.to(countHero, {
+                    right: "-20%"
+                }, "<");
             }
             if (servicesSection) {
-                if (itemFirstTxt) gsap.to(itemFirstTxt, {
-                    y: "0%",
-                    opacity: 1,
-                    stagger: index => index * .05,
-                    scrollTrigger: {
-                        trigger: servicesSection,
-                        start: "top 60%",
-                        end: "80% bottom",
-                        scrub: 1
-                    }
-                });
-                if (navFirstItem) gsap.to(navFirstItem, {
-                    opacity: 1,
-                    stagger: index => index * .05,
-                    scrollTrigger: {
-                        trigger: servicesSection,
-                        start: "top center",
-                        end: "80% bottom",
-                        scrub: 1
-                    }
-                });
                 navLinks.forEach((link => {
                     link.addEventListener("click", (event => {
                         event.preventDefault();
@@ -1535,11 +1651,20 @@
                             const scrollTriggerInstance = ScrollTrigger.getById("servicesTrigger");
                             const totalScrollableHeight = scrollTriggerInstance.end - scrollTriggerInstance.start;
                             const targetScrollY = scrollTriggerInstance.start + scrollTriggerProgress * totalScrollableHeight;
+                            lenis.scrollTo(targetScrollY, {
+                                immediate: true
+                            });
                             gsap.to(window, {
                                 scrollTo: {
-                                    y: targetScrollY
+                                    y: targetScrollY,
+                                    autoKill: false
                                 },
-                                ease: "none"
+                                onStart: () => {
+                                    lenis.stop();
+                                },
+                                onComplete: () => {
+                                    lenis.start();
+                                }
                             });
                         }
                     }));
@@ -1550,27 +1675,29 @@
                     scrollTrigger: {
                         id: "servicesTrigger",
                         trigger: servicesSection,
-                        start: "top 10%",
-                        end: () => `+=${(servicesBody.scrollWidth - servicesBody.offsetWidth) / 3}`,
+                        start: "center 45%",
+                        end: () => `+=${(servicesBody.scrollWidth - servicesBody.offsetWidth) / 1.5}`,
                         scrub: .5,
                         pin: true
                     }
                 });
-                gsap.set(itemServices, {
-                    scale: .5,
-                    y: 50
-                });
                 servicesItems.forEach(((servicesItem, index) => {
                     const target = itemServices[index];
                     if (target) gsap.to(target, {
-                        scale: 1,
-                        y: 0,
-                        ease: "power2.out",
+                        keyframes: [ {
+                            scale: 1,
+                            ease: "power2.out",
+                            duration: 2
+                        }, {
+                            scale: .5,
+                            ease: "power2.inOut",
+                            duration: 2
+                        } ],
                         scrollTrigger: {
                             trigger: servicesItem,
                             containerAnimation: scrollTween,
-                            start: "80% bottom",
-                            end: "bottom top",
+                            start: "50% bottom",
+                            end: "150% -100%",
                             scrub: .5,
                             id: `item-services-${index}`
                         }
@@ -1593,12 +1720,14 @@
                         trigger: partnersSection,
                         start: "10% bottom",
                         end: "bottom center",
-                        scrub: 1.2
+                        scrub: .5
                     }
                 }).to(partnersTitle, {
                     backgroundSize: "100% 100%"
                 }).to(partnersTitle, {
-                    backgroundSize: "100% 0%"
+                    backgroundSize: "100% 0%",
+                    left: "-20%",
+                    top: "-20%"
                 });
                 gsap.timeline({
                     scrollTrigger: {
@@ -1624,11 +1753,26 @@
                     }
                 });
                 gsap.to(partnersListItems, {
-                    top: 0,
+                    keyframes: [ {
+                        top: 0
+                    }, {
+                        top: "-10%",
+                        duration: 1
+                    } ],
                     scrollTrigger: {
                         trigger: partnersSection,
                         start: "top bottom",
-                        end: "top top",
+                        end: "center center",
+                        scrub: 1.2
+                    }
+                });
+                gsap.to(advisers, {
+                    y: 0,
+                    left: 0,
+                    scrollTrigger: {
+                        trigger: partnersSection,
+                        start: "center center",
+                        end: "bottom 60%",
                         scrub: 1
                     }
                 });
@@ -1656,16 +1800,8 @@
         }
         createAnimation();
     }));
-    window.addEventListener("orientationchange", (() => {
-        location.reload();
-    }));
-    let lastWindowWidth = window.innerWidth;
-    window.addEventListener("resize", (() => {
-        const currentWindowWidth = window.innerWidth;
-        if (currentWindowWidth !== lastWindowWidth) location.reload();
-        lastWindowWidth = currentWindowWidth;
-    }));
     window["FLS"] = false;
     addLoadedClass();
     menuInit();
+    digitsCounter();
 })();
